@@ -1,0 +1,93 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 36
+    ndkVersion = '29.0.14206865'
+    buildToolsVersion = '36.1.0'
+
+    defaultConfig {
+        applicationId 'rprop.app.video'
+        namespace 'rprop.app.video'
+        minSdkVersion 29
+        targetSdkVersion 35
+        versionCode 1
+        versionName '1.0'
+    }
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include "arm64-v8a", "x86_64"
+        }
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file('sign.jks')
+            storePassword 'VideoCut'
+            keyAlias 'VideoCut'
+            keyPassword 'VideoCut'
+        }
+    }
+
+    dataBinding {
+        enabled = true
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            signingConfig = signingConfigs.debug
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+
+    aaptOptions {
+        cruncherEnabled false
+    }
+
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    packagingOptions {
+        jniLibs {
+            excludes += ['kotlin/*', 'kotlin/**', 'META-INF/android*', 'META-INF/kotlin*']
+        }
+        resources {
+            excludes += ['kotlin/*', 'kotlin/**', 'META-INF/android*', 'META-INF/kotlin*']
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.aar', '*.jar'])
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.3.10'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+    implementation 'androidx.documentfile:documentfile:1.1.0'
+    implementation 'com.github.bumptech.glide:glide:5.0.7'
+    // implementation 'com.arthenica:smart-exception-common:0.2.1'
+    // implementation 'com.arthenica:smart-exception-java:0.2.1'
+    // implementation 'com.arthenica:ffmpeg-kit-min-gpl:6.0-2'
+}
+
+configurations.configureEach {
+    // exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+    // exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+}
+
+repositories {
+    mavenCentral()
+}
