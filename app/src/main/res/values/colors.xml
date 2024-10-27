@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="md_theme_primary">#3F51B5</color>
+    <color name="md_theme_on_primary">#FFFFFF</color>
+    <color name="md_theme_primary_container">#E8EAF6</color>
+    <color name="md_theme_on_primary_container">#1A237E</color>
+    <color name="md_theme_secondary">#565E71</color>
+    <color name="md_theme_on_secondary">#FFFFFF</color>
+    <color name="md_theme_surface">#FEFBFF</color>
+    <color name="md_theme_on_surface">#1B1B1F</color>
+    <color name="md_theme_on_surface_variant">#44474F</color>
+    <color name="md_theme_surface_container">#F0F0F3</color>
+    <color name="md_theme_surface_container_high">#E8E8EB</color>
+    <color name="md_theme_outline">#74777F</color>
+    <color name="md_theme_error">#BA1A1A</color>
+    <color name="md_theme_scrim">#7F000000</color>
+    <color name="md_theme_selection_overlay">#663F51B5</color>
+    <color name="md_theme_select_circle_fill">#BFFFFFFF</color>
+    <color name="md_theme_select_circle_stroke">#3F51B5</color>
+
+    <!-- Legacy aliases for code references -->
+    <color name="white">#FFFFFFFF</color>
+    <color name="red">#AACC0000</color>
+    <color name="shadow_color">@color/md_theme_scrim</color>
+    <color name="text_search_highlight">#66FFF176</color>
+    <color name="text_search_current">#FFFFA000</color>
+</resources>

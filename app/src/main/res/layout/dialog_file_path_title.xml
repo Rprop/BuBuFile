@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:breakStrategy="simple"
+    android:ellipsize="none"
+    android:hyphenationFrequency="none"
+    android:paddingStart="24dp"
+    android:paddingTop="16dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="4dp"
+    android:textAppearance="@style/TextAppearance.BuBuFile.DialogPathTitle" />

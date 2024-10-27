@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_find_previous"
+        android:icon="@drawable/ic_find_previous"
+        android:title="@string/find_previous"
+        android:visible="false"
+        app:iconTint="?attr/colorOnSurface"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_find_next"
+        android:icon="@drawable/ic_find_next"
+        android:title="@string/find_next"
+        android:visible="false"
+        app:iconTint="?attr/colorOnSurface"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_word_wrap"
+        android:checkable="true"
+        android:title="@string/word_wrap_view"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_find"
+        android:title="@string/find_in_text"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_share"
+        android:title="@string/share_to"
+        app:showAsAction="never" />
+</menu>
