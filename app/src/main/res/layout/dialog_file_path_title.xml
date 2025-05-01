@@ -8,5 +8,5 @@
     android:paddingStart="24dp"
     android:paddingTop="16dp"
     android:paddingEnd="24dp"
-    android:paddingBottom="4dp"
+    android:paddingBottom="0dp"
     android:textAppearance="@style/TextAppearance.BuBuFile.DialogPathTitle" />

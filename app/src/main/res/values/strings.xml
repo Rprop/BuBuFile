@@ -33,8 +33,6 @@
     <string name="find_not_found">Not found</string>
     <string name="find_not_found_more">Not found in loaded text</string>
     <string name="find_result">%1$d / %2$d</string>
-    <string name="file_open_unsupported">Unsupported file type</string>
-    <string name="file_manual_chooser_label">BuBuFile-choose</string>
     <string name="open_as_text">Open as Text</string>
     <string name="open_as_video">Open as Video</string>
     <string name="copy_to">Copy to</string>

@@ -25,7 +25,4 @@ An Android app for viewing files and working with videos. Material Design 3 UI w
 
 ### Open files from other apps
 
-Receive files via Android “Open with”:
-
-- **BuBuFile**: opens text, image, or video automatically by type
-- **BuBuFile-choose**: pick text, image, or video, share, or copy to a folder
+Receive files via Android “Open with” **BuBuFile**, then pick how to open (text / image / video), share, or copy to a folder.

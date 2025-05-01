@@ -2,17 +2,22 @@ package rprop.app.ui;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
-import android.util.Log;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.StyleSpan;
 import android.webkit.MimeTypeMap;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.documentfile.provider.DocumentFile;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import rp.file.R;
 import rprop.app.img.ImageViewActivity;
@@ -20,46 +25,120 @@ import rprop.app.txt.TextViewActivity;
 import rprop.app.video.play.VideoPlayActivity;
 
 public final class FileChooserActivity extends AppCompatActivity {
-    private static final String TAG = "file-chooser";
+    private static final int OPTION_TEXT = 0;
+    private static final int OPTION_IMAGE = 1;
+    private static final int OPTION_VIDEO = 2;
+    private static final int OPTION_SHARE = 3;
+    private static final int OPTION_COPY = 4;
+
+    private static final int[] OPEN_OPTIONS = {
+            OPTION_TEXT, OPTION_IMAGE, OPTION_VIDEO
+    };
+
+    @Nullable
+    private Uri mUri;
+    private FileCopyToHelper mCopyToHelper;
+    @NonNull
+    private int[] mOptionIds = new int[0];
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        routeIntent(getIntent());
+        this.mCopyToHelper = new FileCopyToHelper(this, () -> this.mUri, this::finish);
+        showOpenModeDialog(getIntent());
     }
 
     @Override
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        routeIntent(intent);
+        showOpenModeDialog(intent);
     }
 
-    private void routeIntent(@Nullable final Intent intent) {
-        if (intent == null) {
+    private void showOpenModeDialog(final Intent intent) {
+        final Uri uri = FileOpenIntentHelper.extractUri(intent);
+        if (uri == null) {
             finish();
             return;
         }
-        final Uri uri = FileOpenIntentHelper.extractUri(intent);
-        if (uri == null) {
-            showUnsupportedAndFinish();
-            return;
+        this.mUri = uri;
+        final int suggested = resolveSuggestedOption(intent, uri);
+        final CharSequence[] items = buildOptionItems(suggested);
+        final TextView titleView = (TextView) getLayoutInflater()
+                .inflate(R.layout.dialog_file_path_title, null);
+        titleView.setText(FileUriActions.resolvePathLabel(this, uri));
+        new MaterialAlertDialogBuilder(this)
+                .setCustomTitle(titleView)
+                .setItems(items, (dialog, which) -> handleOption(which))
+                .setOnCancelListener(dialog -> finish())
+                .show();
+    }
+
+    @NonNull
+    private CharSequence[] buildOptionItems(final int suggested) {
+        final int[] ids = new int[OPEN_OPTIONS.length + 2];
+        int index = 0;
+        if (isOpenOption(suggested)) {
+            ids[index++] = suggested;
         }
+        for (final int option : OPEN_OPTIONS) {
+            if (option != suggested) {
+                ids[index++] = option;
+            }
+        }
+        ids[index++] = OPTION_SHARE;
+        ids[index] = OPTION_COPY;
+        this.mOptionIds = ids;
+
+        final CharSequence[] items = new CharSequence[ids.length];
+        for (int i = 0; i < ids.length; i++) {
+            final int option = ids[i];
+            final CharSequence label = getString(labelRes(option));
+            items[i] = option == suggested ? bold(label) : label;
+        }
+        return items;
+    }
+
+    private static boolean isOpenOption(final int option) {
+        return option == OPTION_TEXT || option == OPTION_IMAGE || option == OPTION_VIDEO;
+    }
+
+    private static int labelRes(final int option) {
+        switch (option) {
+            case OPTION_IMAGE:
+                return R.string.open_as_image;
+            case OPTION_VIDEO:
+                return R.string.open_as_video;
+            case OPTION_SHARE:
+                return R.string.share_to;
+            case OPTION_COPY:
+                return R.string.copy_to;
+            case OPTION_TEXT:
+            default:
+                return R.string.open_as_text;
+        }
+    }
+
+    @NonNull
+    private static CharSequence bold(@NonNull final CharSequence text) {
+        final SpannableString spannable = new SpannableString(text);
+        spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, spannable.length(),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return spannable;
+    }
+
+    private int resolveSuggestedOption(@NonNull final Intent intent, @NonNull final Uri uri) {
         final String mimeType = resolveMimeType(intent, uri);
-        Log.d(TAG, mimeType + ' ' + uri);
         if (isTextType(mimeType)) {
-            forwardToText(uri);
-            return;
+            return OPTION_TEXT;
         }
         if (isImageType(mimeType)) {
-            forwardToImage(uri);
-            return;
+            return OPTION_IMAGE;
         }
         if (isVideoType(mimeType)) {
-            forwardToVideo(uri);
-            return;
+            return OPTION_VIDEO;
         }
-        showUnsupportedAndFinish();
+        return -1;
     }
 
     @Nullable
@@ -201,23 +280,35 @@ public final class FileChooserActivity extends AppCompatActivity {
         }
     }
 
-    private void forwardToText(@NonNull final Uri uri) {
-        TextViewActivity.call(this, uri);
-        finish();
-    }
-
-    private void forwardToImage(@NonNull final Uri uri) {
-        ImageViewActivity.call(this, uri);
-        finish();
-    }
-
-    private void forwardToVideo(@NonNull final Uri uri) {
-        VideoPlayActivity.call(this, uri);
-        finish();
-    }
-
-    private void showUnsupportedAndFinish() {
-        Toast.makeText(this, R.string.file_open_unsupported, Toast.LENGTH_LONG).show();
+    private void handleOption(final int which) {
+        if (which < 0 || which >= this.mOptionIds.length) {
+            finish();
+            return;
+        }
+        final Uri uri = this.mUri;
+        if (uri == null) {
+            finish();
+            return;
+        }
+        switch (this.mOptionIds[which]) {
+            case OPTION_TEXT:
+                TextViewActivity.call(this, uri);
+                break;
+            case OPTION_IMAGE:
+                ImageViewActivity.call(this, uri);
+                break;
+            case OPTION_VIDEO:
+                VideoPlayActivity.call(this, uri);
+                break;
+            case OPTION_SHARE:
+                FileUriActions.share(this, uri);
+                return;
+            case OPTION_COPY:
+                this.mCopyToHelper.start();
+                return;
+            default:
+                break;
+        }
         finish();
     }
 }

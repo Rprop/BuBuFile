@@ -1,0 +1,68 @@
+name: Android CI/CD
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v4
+
+    - name: Install Android SDK packages
+      run: |
+        sdkmanager --install \
+          "cmake;3.31.6" \
+          "ndk;29.0.14206865" \
+          "platforms;android-36" \
+          "build-tools;36.1.0"
+
+    - name: Use official Gradle distribution
+      run: |
+        sed -i -E \
+          's|mirrors\.aliyun\.com/gradle/distributions/v[0-9.]+|services.gradle.org/distributions|' \
+          gradle/wrapper/gradle-wrapper.properties
+        sed -i 's/validateDistributionUrl=false/validateDistributionUrl=true/' \
+          gradle/wrapper/gradle-wrapper.properties
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Build with Gradle
+      run: ./gradlew assembleRelease
+
+    - name: List APKs
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+      run: find app/build/outputs/apk/release -name '*.apk' -type f
+
+    - name: Generate Release Tag
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+      id: tag
+      run: echo "release_tag=v$(date +'%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
+
+    - name: Create GitHub Release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.tag.outputs.release_tag }}
+        name: Release ${{ steps.tag.outputs.release_tag }}
+        draft: false
+        prerelease: false
+        fail_on_unmatched_files: true
+        files: app/build/outputs/apk/release/*.apk

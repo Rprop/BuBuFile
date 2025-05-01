@@ -33,8 +33,6 @@
     <string name="find_not_found">未找到</string>
     <string name="find_not_found_more">未找到（可能尚未加载后续内容）</string>
     <string name="find_result">%1$d / %2$d</string>
-    <string name="file_open_unsupported">不支持打开此文件类型</string>
-    <string name="file_manual_chooser_label">文件布-打开方式</string>
     <string name="open_as_text">以文本方式打开</string>
     <string name="open_as_video">以视频方式打开</string>
     <string name="copy_to">复制到</string>
