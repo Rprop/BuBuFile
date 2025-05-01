@@ -22,6 +22,9 @@
     <string name="video_section_app">剪辑作品</string>
     <string name="video_section_other">其他视频</string>
     <string name="text_read_failed">无法读取文本文件</string>
+    <string name="image_read_failed">无法打开图片</string>
+    <string name="image_loading_hd">加载高清细节…</string>
+    <string name="open_as_image">以图片方式打开</string>
     <string name="word_wrap_view">换行查看</string>
     <string name="find_in_text">查找</string>
     <string name="find_query_hint">输入要查找的文字</string>

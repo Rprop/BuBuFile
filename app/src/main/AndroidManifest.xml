@@ -100,6 +100,12 @@
             android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize"
             android:exported="false"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name="rprop.app.img.ImageViewActivity"
+            android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize"
+            android:exported="false"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

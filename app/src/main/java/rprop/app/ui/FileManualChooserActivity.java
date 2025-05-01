@@ -14,14 +14,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import rp.file.R;
+import rprop.app.img.ImageViewActivity;
 import rprop.app.txt.TextViewActivity;
 import rprop.app.video.play.VideoPlayActivity;
 
 public final class FileManualChooserActivity extends AppCompatActivity {
     private static final int OPTION_TEXT = 0;
-    private static final int OPTION_VIDEO = 1;
-    private static final int OPTION_SHARE = 2;
-    private static final int OPTION_MOVE = 3;
+    private static final int OPTION_IMAGE = 1;
+    private static final int OPTION_VIDEO = 2;
+    private static final int OPTION_SHARE = 3;
+    private static final int OPTION_MOVE = 4;
 
     @Nullable
     private Uri mUri;
@@ -52,6 +54,7 @@ public final class FileManualChooserActivity extends AppCompatActivity {
                 .setCustomTitle(titleView)
                 .setItems(new CharSequence[]{
                         getString(R.string.open_as_text),
+                        getString(R.string.open_as_image),
                         getString(R.string.open_as_video),
                         getString(R.string.share_to),
                         getString(R.string.copy_to)
@@ -69,6 +72,9 @@ public final class FileManualChooserActivity extends AppCompatActivity {
         switch (which) {
             case OPTION_TEXT:
                 TextViewActivity.call(this, uri);
+                break;
+            case OPTION_IMAGE:
+                ImageViewActivity.call(this, uri);
                 break;
             case OPTION_VIDEO:
                 VideoPlayActivity.call(this, uri);

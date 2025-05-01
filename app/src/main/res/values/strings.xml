@@ -22,6 +22,9 @@
     <string name="video_section_app">Trimmed videos</string>
     <string name="video_section_other">Other videos</string>
     <string name="text_read_failed">Unable to read text file</string>
+    <string name="image_read_failed">Unable to open image</string>
+    <string name="image_loading_hd">Loading HD details…</string>
+    <string name="open_as_image">Open as Image</string>
     <string name="word_wrap_view">Word wrap</string>
     <string name="find_in_text">Find</string>
     <string name="find_query_hint">Search text</string>

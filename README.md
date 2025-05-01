@@ -11,6 +11,12 @@ An Android app for viewing files and working with videos. Material Design 3 UI w
 - Merge multiple videos (including fast merge)
 - Multi-select delete and share
 
+### Image
+
+- View high-resolution images with pinch/double-tap zoom
+- Tile decoding for large photos without loading the full bitmap into memory
+- Share to other apps
+
 ### Text
 
 - View text files (large files loaded in chunks)
@@ -21,5 +27,5 @@ An Android app for viewing files and working with videos. Material Design 3 UI w
 
 Receive files via Android “Open with”:
 
-- **BuBuFile**: opens text or video automatically by type
-- **BuBuFile-choose**: pick text or video, share, or copy to a folder
+- **BuBuFile**: opens text, image, or video automatically by type
+- **BuBuFile-choose**: pick text, image, or video, share, or copy to a folder

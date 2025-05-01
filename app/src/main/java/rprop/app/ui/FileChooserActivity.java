@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.documentfile.provider.DocumentFile;
 
 import rp.file.R;
+import rprop.app.img.ImageViewActivity;
 import rprop.app.txt.TextViewActivity;
 import rprop.app.video.play.VideoPlayActivity;
 
@@ -48,6 +49,10 @@ public final class FileChooserActivity extends AppCompatActivity {
         Log.d(TAG, mimeType + ' ' + uri);
         if (isTextType(mimeType)) {
             forwardToText(uri);
+            return;
+        }
+        if (isImageType(mimeType)) {
+            forwardToImage(uri);
             return;
         }
         if (isVideoType(mimeType)) {
@@ -115,6 +120,9 @@ public final class FileChooserActivity extends AppCompatActivity {
         if (isTextExtension(extension)) {
             return "text/plain";
         }
+        if (isImageExtension(extension)) {
+            return "image/*";
+        }
         if (isVideoExtension(extension)) {
             return "video/*";
         }
@@ -123,6 +131,10 @@ public final class FileChooserActivity extends AppCompatActivity {
 
     private static boolean isTextType(@Nullable final String mimeType) {
         return mimeType != null && mimeType.startsWith("text/");
+    }
+
+    private static boolean isImageType(@Nullable final String mimeType) {
+        return mimeType != null && mimeType.startsWith("image/");
     }
 
     private static boolean isVideoType(@Nullable final String mimeType) {
@@ -153,6 +165,25 @@ public final class FileChooserActivity extends AppCompatActivity {
         }
     }
 
+    private static boolean isImageExtension(@NonNull final String extension) {
+        switch (extension) {
+            case "jpg":
+            case "jpeg":
+            case "png":
+            case "gif":
+            case "webp":
+            case "bmp":
+            case "heic":
+            case "heif":
+            case "avif":
+            case "tif":
+            case "tiff":
+                return true;
+            default:
+                return false;
+        }
+    }
+
     private static boolean isVideoExtension(@NonNull final String extension) {
         switch (extension) {
             case "mp4":
@@ -172,6 +203,11 @@ public final class FileChooserActivity extends AppCompatActivity {
 
     private void forwardToText(@NonNull final Uri uri) {
         TextViewActivity.call(this, uri);
+        finish();
+    }
+
+    private void forwardToImage(@NonNull final Uri uri) {
+        ImageViewActivity.call(this, uri);
         finish();
     }
 
