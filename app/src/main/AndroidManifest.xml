@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
@@ -45,6 +47,7 @@
 
         <activity
             android:name="rprop.app.ui.FileChooserActivity"
+            android:excludeFromRecents="true"
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.BuBuFile.Transparent">
@@ -85,6 +88,22 @@
             android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize"
             android:exported="false"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name="rprop.app.zip.ZipBrowseActivity"
+            android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="rp.file.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

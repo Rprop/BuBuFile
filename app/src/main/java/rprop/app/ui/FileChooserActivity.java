@@ -21,18 +21,22 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import rp.file.R;
 import rprop.app.img.ImageViewActivity;
+import rprop.app.lan.LanShareHelper;
 import rprop.app.txt.TextViewActivity;
 import rprop.app.video.play.VideoPlayActivity;
+import rprop.app.zip.ZipBrowseActivity;
 
 public final class FileChooserActivity extends AppCompatActivity {
     private static final int OPTION_TEXT = 0;
     private static final int OPTION_IMAGE = 1;
     private static final int OPTION_VIDEO = 2;
-    private static final int OPTION_SHARE = 3;
-    private static final int OPTION_COPY = 4;
+    private static final int OPTION_ZIP = 3;
+    private static final int OPTION_SHARE = 4;
+    private static final int OPTION_SHARE_LAN = 5;
+    private static final int OPTION_COPY = 6;
 
     private static final int[] OPEN_OPTIONS = {
-            OPTION_TEXT, OPTION_IMAGE, OPTION_VIDEO
+            OPTION_TEXT, OPTION_IMAGE, OPTION_VIDEO, OPTION_ZIP
     };
 
     @Nullable
@@ -76,7 +80,7 @@ public final class FileChooserActivity extends AppCompatActivity {
 
     @NonNull
     private CharSequence[] buildOptionItems(final int suggested) {
-        final int[] ids = new int[OPEN_OPTIONS.length + 2];
+        final int[] ids = new int[OPEN_OPTIONS.length + 3];
         int index = 0;
         if (isOpenOption(suggested)) {
             ids[index++] = suggested;
@@ -87,6 +91,7 @@ public final class FileChooserActivity extends AppCompatActivity {
             }
         }
         ids[index++] = OPTION_SHARE;
+        ids[index++] = OPTION_SHARE_LAN;
         ids[index] = OPTION_COPY;
         this.mOptionIds = ids;
 
@@ -100,7 +105,10 @@ public final class FileChooserActivity extends AppCompatActivity {
     }
 
     private static boolean isOpenOption(final int option) {
-        return option == OPTION_TEXT || option == OPTION_IMAGE || option == OPTION_VIDEO;
+        return option == OPTION_TEXT
+                || option == OPTION_IMAGE
+                || option == OPTION_VIDEO
+                || option == OPTION_ZIP;
     }
 
     private static int labelRes(final int option) {
@@ -109,8 +117,12 @@ public final class FileChooserActivity extends AppCompatActivity {
                 return R.string.open_as_image;
             case OPTION_VIDEO:
                 return R.string.open_as_video;
+            case OPTION_ZIP:
+                return R.string.open_as_zip;
             case OPTION_SHARE:
                 return R.string.share_to;
+            case OPTION_SHARE_LAN:
+                return R.string.share_to_lan;
             case OPTION_COPY:
                 return R.string.copy_to;
             case OPTION_TEXT:
@@ -137,6 +149,9 @@ public final class FileChooserActivity extends AppCompatActivity {
         }
         if (isVideoType(mimeType)) {
             return OPTION_VIDEO;
+        }
+        if (isZipType(mimeType)) {
+            return OPTION_ZIP;
         }
         return -1;
     }
@@ -205,6 +220,9 @@ public final class FileChooserActivity extends AppCompatActivity {
         if (isVideoExtension(extension)) {
             return "video/*";
         }
+        if (isZipExtension(extension)) {
+            return "application/zip";
+        }
         return null;
     }
 
@@ -218,6 +236,21 @@ public final class FileChooserActivity extends AppCompatActivity {
 
     private static boolean isVideoType(@Nullable final String mimeType) {
         return mimeType != null && mimeType.startsWith("video/");
+    }
+
+    private static boolean isZipType(@Nullable final String mimeType) {
+        if (mimeType == null) {
+            return false;
+        }
+        switch (mimeType) {
+            case "application/zip":
+            case "application/x-zip-compressed":
+            case "application/java-archive":
+            case "application/vnd.android.package-archive":
+                return true;
+            default:
+                return false;
+        }
     }
 
     private static boolean isTextExtension(@NonNull final String extension) {
@@ -280,6 +313,19 @@ public final class FileChooserActivity extends AppCompatActivity {
         }
     }
 
+    private static boolean isZipExtension(@NonNull final String extension) {
+        switch (extension) {
+            case "zip":
+            case "jar":
+            case "apk":
+            case "apks":
+            case "xapk":
+                return true;
+            default:
+                return false;
+        }
+    }
+
     private void handleOption(final int which) {
         if (which < 0 || which >= this.mOptionIds.length) {
             finish();
@@ -300,8 +346,14 @@ public final class FileChooserActivity extends AppCompatActivity {
             case OPTION_VIDEO:
                 VideoPlayActivity.call(this, uri);
                 break;
+            case OPTION_ZIP:
+                ZipBrowseActivity.call(this, uri);
+                break;
             case OPTION_SHARE:
                 FileUriActions.share(this, uri);
+                return;
+            case OPTION_SHARE_LAN:
+                LanShareHelper.share(this, uri);
                 return;
             case OPTION_COPY:
                 this.mCopyToHelper.start();

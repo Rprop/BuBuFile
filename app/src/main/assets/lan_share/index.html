@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BuBuFile</title>
+  <link rel="icon" href="/logo.png" type="image/png">
+  <style>{{STYLE}}</style>
+  <script>{{SCRIPT}}</script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="brand-block">
+      <img class="brand-logo" src="/logo.png" width="48" height="48" alt="BuBuFile">
+      <div class="brand-text">
+        <h1 class="brand">BuBuFile</h1>
+        <p class="tagline" data-i18n="tagline">LAN share &amp; upload</p>
+      </div>
+    </div>
+    <div class="badge"><i></i><span data-i18n="port">Port</span> {{PORT}}</div>
+  </header>
+
+  <div id="flash" class="flash {{FLASH_CLASS}}"{{FLASH_ATTR}}>{{FLASH_BODY}}</div>
+
+  <nav class="tabs" role="tablist" aria-label="BuBuFile">
+    <button type="button" class="tab" role="tab" data-tab="shared" aria-selected="true"
+            data-i18n="shared_title">Shared files</button>
+    <button type="button" class="tab" role="tab" data-tab="upload" aria-selected="false"
+            data-i18n="upload_title">Upload to phone</button>
+    <button type="button" class="tab" role="tab" data-tab="clipboard" aria-selected="false"
+            data-i18n="clip_title">Clipboard</button>
+  </nav>
+
+  <section class="card tab-panel" data-panel="shared" role="tabpanel">
+    <p class="hint" data-i18n="shared_hint">Files currently available from this phone</p>
+    {{SHARED_LIST}}
+  </section>
+
+  <section class="card tab-panel" data-panel="upload" role="tabpanel" hidden>
+    <p class="hint" data-i18n="upload_hint">
+      Choose files, paste with Ctrl+V / ⌘V, or drop them below. Hover an image to preview.
+    </p>
+    <form id="upload-form" action="/upload" method="post">
+      <div class="drop" id="drop">
+        <div id="ff"></div>
+        <div class="toolbar">
+          <button type="button" class="btn btn-secondary" onclick="addFile()" data-i18n="add_file">+ Add file</button>
+        </div>
+      </div>
+      <div class="modes">
+        <label class="mode">
+          <input type="radio" name="t" value="{{MODE_SHARE}}" checked>
+          <strong data-i18n="mode_share">Share To Apps</strong>
+          <span data-i18n="mode_share_desc">Open the system share sheet</span>
+        </label>
+        <label class="mode">
+          <input type="radio" name="t" value="{{MODE_DOWNLOAD}}">
+          <strong data-i18n="mode_download">Upload Files To Download</strong>
+          <span data-i18n="mode_download_desc">Save into the Download folder</span>
+        </label>
+        <label class="mode">
+          <input type="radio" name="t" value="{{MODE_INSTALL}}">
+          <strong data-i18n="mode_install">Install Apk</strong>
+          <span data-i18n="mode_install_desc">Launch the package installer</span>
+        </label>
+      </div>
+      <div class="actions">
+        <div id="upload-status"></div>
+        <button type="submit" class="btn btn-primary" data-i18n="submit">Submit</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card tab-panel" data-panel="clipboard" role="tabpanel" hidden>
+    <p class="hint" data-i18n="clip_hint">
+      Keep BuBuFile in the foreground on the phone, then read or set clipboard text here.
+    </p>
+    <pre id="clipboard-out" class="clip-out"
+         data-i18n-empty="clip_phone_empty"
+         data-empty="Phone clipboard is empty"></pre>
+    <textarea id="clipboard-text" class="clip"
+              data-i18n-placeholder="clip_placeholder"
+              placeholder="Text to set on phone"></textarea>
+    <div class="toolbar" style="margin-top:12px">
+      <button type="button" class="btn btn-secondary" onclick="loadClipboard()" data-i18n="clip_read">Read from phone</button>
+      <button type="button" class="btn btn-primary" onclick="setClipboard()" data-i18n="clip_set">Set on phone</button>
+    </div>
+    <div id="clipboard-status" style="margin-top:10px"></div>
+  </section>
+
+  <footer class="footer-bar">
+    <div class="lang-switch">
+      <button type="button" data-lang="zh" onclick="applyLang('zh')">中文</button>
+      <span>|</span>
+      <button type="button" data-lang="en" onclick="applyLang('en')">English</button>
+    </div>
+    <span class="footer-sep">·</span>
+    <div class="theme-switch">
+      <button type="button" data-theme-set="light" onclick="applyTheme('light')">
+        <span data-i18n="theme_light">Light</span>
+      </button>
+      <span>|</span>
+      <button type="button" data-theme-set="dark" onclick="applyTheme('dark')">
+        <span data-i18n="theme_dark">Dark</span>
+      </button>
+    </div>
+  </footer>
+</div>
+</body>
+</html>

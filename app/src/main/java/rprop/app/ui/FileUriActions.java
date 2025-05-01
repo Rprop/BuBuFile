@@ -10,6 +10,7 @@ import android.provider.DocumentsContract;
 import android.system.Os;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.documentfile.provider.DocumentFile;
 
 import java.io.File;
@@ -46,15 +47,20 @@ public final class FileUriActions {
             final ParcelFileDescriptor pfd = resolver.openFileDescriptor(uri, "r");
             if (pfd != null) {
                 try (pfd) {
-                    final int fd = pfd.getFd();
-                    final String inputFile = "/proc/self/fd/" + fd;
-                    try {
-                        return Os.readlink(inputFile);
-                    } catch (final Exception e) {
-                        Log.w(TAG, e);
-                    }
+                    return readLink(pfd);
                 }
             }
+        } catch (final Exception e) {
+            Log.w(TAG, e);
+        }
+        return null;
+    }
+
+    public static String readLink(@NonNull final ParcelFileDescriptor pfd) {
+        try {
+            final int fd = pfd.getFd();
+            final String inputFile = "/proc/self/fd/" + fd;
+            return Os.readlink(inputFile);
         } catch (final Exception e) {
             Log.w(TAG, e);
         }

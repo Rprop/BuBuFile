@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.BuBuFile.CardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/screen_horizontal_margin"
+    android:layout_marginTop="@dimen/list_item_vertical_margin"
+    android:layout_marginEnd="@dimen/screen_horizontal_margin"
+    android:layout_marginBottom="@dimen/list_item_vertical_margin"
+    android:clickable="true"
+    android:focusable="true"
+    app:contentPadding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/item_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="middle"
+            android:maxLines="2"
+            android:textAppearance="@style/TextAppearance.BuBuFile.BodyMedium"
+            tools:text="res/drawable/" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/item_meta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textAppearance="@style/TextAppearance.BuBuFile.LabelLarge"
+            tools:text="12.3 KB" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

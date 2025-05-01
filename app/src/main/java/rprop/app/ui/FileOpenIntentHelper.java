@@ -7,9 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public final class FileOpenIntentHelper {
-    private FileOpenIntentHelper() {
-    }
-
     @Nullable
     public static Uri extractUri(@NonNull final Intent intent) {
         if (Intent.ACTION_SEND.equals(intent.getAction())) {
