@@ -17,6 +17,7 @@ import androidx.documentfile.provider.DocumentFile;
 
 import rp.file.R;
 import rp.file.databinding.ActivityImageViewBinding;
+import rprop.app.ui.FileCopyToHelper;
 import rprop.app.ui.FileUriActions;
 import rprop.app.video.utils.DisplayUtils;
 
@@ -25,6 +26,7 @@ public final class ImageViewActivity extends AppCompatActivity implements ImageV
     private ActivityImageViewBinding mBinding;
     @Nullable
     private Uri mUri;
+    private FileCopyToHelper mCopyToHelper;
 
     public static void call(final Activity activity, final Uri imageUri) {
         final Intent intent = new Intent(activity, ImageViewActivity.class);
@@ -40,6 +42,7 @@ public final class ImageViewActivity extends AppCompatActivity implements ImageV
 
         this.mBinding = DataBindingUtil.setContentView(this, R.layout.activity_image_view);
         this.mBinding.imageViewer.setOnImageViewerListener(this);
+        this.mCopyToHelper = new FileCopyToHelper(this, () -> this.mUri);
         resolveIntent(getIntent());
     }
 
@@ -114,6 +117,11 @@ public final class ImageViewActivity extends AppCompatActivity implements ImageV
         if (uri != null) {
             FileUriActions.share(this, uri);
         }
+    }
+
+    @Override
+    public void onCopyToRequested() {
+        this.mCopyToHelper.start();
     }
 
     @Override

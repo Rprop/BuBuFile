@@ -40,6 +40,7 @@ import java.util.Locale;
 import rp.file.BuildConfig;
 import rp.file.R;
 import rp.file.databinding.ActivityVideoSelectBinding;
+import rprop.app.ui.FileCopyToHelper;
 import rprop.app.video.concat.VideoConcatActivity;
 import rprop.app.video.play.VideoPlayActivity;
 import rprop.app.video.utils.DisplayUtils;
@@ -72,6 +73,9 @@ public final class VideoSelectActivity extends AppCompatActivity {
     private int mRefreshLoadersPending;
     private boolean mSelectionMode;
     private final LinkedHashSet<Uri> mSelectedUris = new LinkedHashSet<>();
+    @Nullable
+    private Uri mCopyToUri;
+    private FileCopyToHelper mCopyToHelper;
 
     @SuppressLint("CheckResult")
     @Override
@@ -105,6 +109,7 @@ public final class VideoSelectActivity extends AppCompatActivity {
         this.mBinding.swipeRefresh.setColorSchemeColors(
                 MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnPrimary, 0));
         this.mBinding.swipeRefresh.setOnRefreshListener(this::reloadVideoList);
+        this.mCopyToHelper = new FileCopyToHelper(this, () -> this.mCopyToUri);
 
         final String[] permissions;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -187,6 +192,11 @@ public final class VideoSelectActivity extends AppCompatActivity {
             this.mSelectedUris.add(uri);
         }
         updateSelectionUi();
+    }
+
+    public void startCopyTo(@NonNull final Uri uri) {
+        this.mCopyToUri = uri;
+        this.mCopyToHelper.start();
     }
 
     private void updateSelectionUi() {

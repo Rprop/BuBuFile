@@ -15,6 +15,7 @@ import java.io.IOException;
 
 import rp.file.R;
 import rp.file.databinding.ActivityTextViewBinding;
+import rprop.app.ui.FileCopyToHelper;
 import rprop.app.ui.FileUriActions;
 import rprop.app.video.utils.DisplayUtils;
 
@@ -27,6 +28,7 @@ public final class TextViewActivity extends AppCompatActivity implements TextVie
     private TextChunkReader mReader;
     private volatile boolean mLoadingChunk;
     private int mLoadGeneration;
+    private FileCopyToHelper mCopyToHelper;
 
     public static void call(final Activity activity, final Uri textUri) {
         final Intent intent = new Intent(activity, TextViewActivity.class);
@@ -42,6 +44,7 @@ public final class TextViewActivity extends AppCompatActivity implements TextVie
 
         this.mBinding = DataBindingUtil.setContentView(this, R.layout.activity_text_view);
         this.mBinding.textViewer.setOnTextViewerListener(this);
+        this.mCopyToHelper = new FileCopyToHelper(this, () -> this.mUri);
         resolveIntent(getIntent());
     }
 
@@ -179,6 +182,11 @@ public final class TextViewActivity extends AppCompatActivity implements TextVie
         if (uri != null) {
             FileUriActions.share(this, uri);
         }
+    }
+
+    @Override
+    public void onCopyToRequested() {
+        this.mCopyToHelper.start();
     }
 
     @Override

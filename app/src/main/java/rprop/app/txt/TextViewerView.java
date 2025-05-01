@@ -110,6 +110,12 @@ public final class TextViewerView extends RelativeLayout {
                 }
                 return true;
             }
+            if (itemId == R.id.action_copy_to) {
+                if (this.mListener != null) {
+                    this.mListener.onCopyToRequested();
+                }
+                return true;
+            }
             if (itemId == R.id.action_find) {
                 showFindDialog();
                 return true;

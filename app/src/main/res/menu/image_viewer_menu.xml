@@ -5,4 +5,8 @@
         android:id="@+id/action_share"
         android:title="@string/share_to"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_copy_to"
+        android:title="@string/copy_to"
+        app:showAsAction="never" />
 </menu>

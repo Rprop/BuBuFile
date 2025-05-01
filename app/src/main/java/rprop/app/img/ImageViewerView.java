@@ -59,9 +59,16 @@ public final class ImageViewerView extends RelativeLayout {
             }
         });
         this.mToolbar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.action_share) {
+            final int itemId = item.getItemId();
+            if (itemId == R.id.action_share) {
                 if (this.mListener != null) {
                     this.mListener.onShareRequested();
+                }
+                return true;
+            }
+            if (itemId == R.id.action_copy_to) {
+                if (this.mListener != null) {
+                    this.mListener.onCopyToRequested();
                 }
                 return true;
             }

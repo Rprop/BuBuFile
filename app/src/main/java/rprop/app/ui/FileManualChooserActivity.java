@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -27,10 +25,12 @@ public final class FileManualChooserActivity extends AppCompatActivity {
 
     @Nullable
     private Uri mUri;
+    private FileCopyToHelper mCopyToHelper;
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.mCopyToHelper = new FileCopyToHelper(this, () -> this.mUri, this::finish);
         showOpenModeDialog(getIntent());
     }
 
@@ -83,35 +83,11 @@ public final class FileManualChooserActivity extends AppCompatActivity {
                 FileUriActions.share(this, uri);
                 return;
             case OPTION_MOVE:
-                startMoveTo();
+                this.mCopyToHelper.start();
                 return;
             default:
                 break;
         }
         finish();
-    }
-
-    private final ActivityResultLauncher<Intent> mLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                final Uri uri = this.mUri;
-                if (result.getResultCode() != RESULT_OK || result.getData() == null || uri == null) {
-                    finish();
-                    return;
-                }
-                final Uri treeUri = result.getData().getData();
-                if (treeUri == null) {
-                    Toast.makeText(this, R.string.copy_failed, Toast.LENGTH_LONG).show();
-                    finish();
-                    return;
-                }
-                final boolean moved = FileUriActions.moveToTree(this, uri, treeUri);
-                Toast.makeText(this, moved ? R.string.copy_done : R.string.copy_failed, Toast.LENGTH_LONG).show();
-                finish();
-            });
-
-    private void startMoveTo() {
-        final Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        intent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        this.mLauncher.launch(intent);
     }
 }

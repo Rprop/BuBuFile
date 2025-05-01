@@ -5,5 +5,7 @@ public interface ImageViewerListener {
 
     void onShareRequested();
 
+    void onCopyToRequested();
+
     void onImageLoadFailed();
 }

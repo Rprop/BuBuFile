@@ -7,5 +7,7 @@ public interface TextViewerListener {
 
     void onShareRequested();
 
+    void onCopyToRequested();
+
     boolean hasMoreText();
 }

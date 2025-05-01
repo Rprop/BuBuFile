@@ -1,7 +1,6 @@
 package rprop.app.video.select;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
@@ -19,6 +18,7 @@ import androidx.annotation.NonNull;
 import com.bumptech.glide.Glide;
 
 import rp.file.R;
+import rprop.app.ui.FileUriActions;
 import rprop.app.video.play.VideoPlayActivity;
 import rprop.app.video.utils.DisplayUtils;
 import rprop.app.video.utils.VideoUtils;
@@ -79,15 +79,16 @@ public final class VideoSelectAdapter extends CursorAdapter {
             v.showContextMenu();
             return true;
         });
-        videoItemView.setOnCreateContextMenuListener((menu, v, menuInfo) ->
-                menu.add(context.getString(R.string.share_to)).setOnMenuItemClickListener(item -> {
-                    final Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                    shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                    shareIntent.setType("video/*");
-                    shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    activity.startActivity(Intent.createChooser(shareIntent, null), null);
-                    return true;
-                }));
+        videoItemView.setOnCreateContextMenuListener((menu, v, menuInfo) -> {
+            menu.add(context.getString(R.string.share_to)).setOnMenuItemClickListener(item -> {
+                FileUriActions.share(activity, uri);
+                return true;
+            });
+            menu.add(context.getString(R.string.copy_to)).setOnMenuItemClickListener(item -> {
+                activity.startCopyTo(uri);
+                return true;
+            });
+        });
     }
 
     private static void updateSelectionUi(final View videoItemView, final VideoSelectActivity activity,
