@@ -1,6 +1,7 @@
 package rprop.app.ui;
 
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +20,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class FileUriActions {
     private static final String TAG = "file-uri-actions";
@@ -166,5 +169,61 @@ public final class FileUriActions {
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
         shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         activity.startActivity(Intent.createChooser(shareIntent, null), null);
+    }
+
+    public static void share(final Activity activity, @NonNull final List<Uri> uris) {
+        if (uris.isEmpty()) {
+            return;
+        }
+        if (uris.size() == 1) {
+            share(activity, uris.get(0));
+            return;
+        }
+        final ArrayList<Uri> streams = new ArrayList<>(uris);
+        final Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        shareIntent.setType(commonMimeType(activity, streams));
+        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, streams);
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        shareIntent.setClipData(clipData(streams));
+        final Intent chooser = Intent.createChooser(shareIntent, null);
+        chooser.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        activity.startActivity(chooser);
+    }
+
+    @NonNull
+    private static String commonMimeType(@NonNull final Activity activity,
+                                         @NonNull final List<Uri> uris) {
+        final ContentResolver resolver = activity.getContentResolver();
+        String shared = null;
+        for (final Uri uri : uris) {
+            final String type = resolver.getType(uri);
+            if (type == null || type.isEmpty()) {
+                return "*/*";
+            }
+            if (shared == null) {
+                shared = type;
+                continue;
+            }
+            if (shared.equals(type)) {
+                continue;
+            }
+            final int slash = shared.indexOf('/');
+            final String major = slash > 0 ? shared.substring(0, slash) : shared;
+            if (type.startsWith(major + "/")) {
+                shared = major + "/*";
+                continue;
+            }
+            return "*/*";
+        }
+        return shared == null ? "*/*" : shared;
+    }
+
+    @NonNull
+    private static ClipData clipData(@NonNull final List<Uri> uris) {
+        final ClipData clipData = ClipData.newRawUri("files", uris.get(0));
+        for (int i = 1; i < uris.size(); i++) {
+            clipData.addItem(new ClipData.Item(uris.get(i)));
+        }
+        return clipData;
     }
 }

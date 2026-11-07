@@ -5,9 +5,14 @@
     <string name="trimming">正在裁剪视频…</string>
     <string name="open_permission">选择视频</string>
     <string name="back">返回</string>
+    <string name="open_files_count">%1$d 个文件</string>
     <string name="share_to">分享到</string>
     <string name="share_to_lan">分享到局域网</string>
-    <string name="lan_share_failed">无法开启局域网分享</string>
+    <string name="lan_share_no_name">无法获取文件名</string>
+    <string name="lan_share_unknown_size">无法获取文件大小</string>
+    <string name="lan_share_server_down">局域网分享服务启动失败</string>
+    <string name="lan_share_open_failed">无法打开要分享的文件</string>
+    <string name="lan_share_qr_failed">无法生成分享二维码</string>
     <string name="lan_share_no_network">未获取到局域网 IP</string>
     <string name="delete">删除</string>
     <string name="delete_need_select">请至少选择 1 个视频</string>
@@ -54,6 +59,7 @@
     <string name="copy_to">复制到</string>
     <string name="copy_done">文件已复制</string>
     <string name="copy_failed">文件复制失败</string>
+    <string name="copy_failed_partial">部分文件复制失败</string>
     <string name="theme_shortcut_light">亮色主题</string>
     <string name="theme_shortcut_dark">暗色主题</string>
     <string name="theme_shortcut_system">跟随系统</string>

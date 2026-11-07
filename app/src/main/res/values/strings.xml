@@ -5,9 +5,14 @@
     <string name="trimming">Trimming video…</string>
     <string name="open_permission">Select video</string>
     <string name="back">Back</string>
+    <string name="open_files_count">%1$d files</string>
     <string name="share_to">Share to</string>
     <string name="share_to_lan">Share to LAN</string>
-    <string name="lan_share_failed">Unable to start LAN share</string>
+    <string name="lan_share_no_name">Unable to get the file name</string>
+    <string name="lan_share_unknown_size">Unable to get the file size</string>
+    <string name="lan_share_server_down">Unable to start the LAN share server</string>
+    <string name="lan_share_open_failed">Unable to open the file for sharing</string>
+    <string name="lan_share_qr_failed">Unable to create the share QR code</string>
     <string name="lan_share_no_network">No LAN IP address available</string>
     <string name="delete">Delete</string>
     <string name="delete_need_select">Select at least 1 video</string>
@@ -54,6 +59,7 @@
     <string name="copy_to">Copy to</string>
     <string name="copy_done">File copied</string>
     <string name="copy_failed">Unable to copy</string>
+    <string name="copy_failed_partial">Some files could not be copied</string>
     <string name="theme_shortcut_light">Light theme</string>
     <string name="theme_shortcut_dark">Dark theme</string>
     <string name="theme_shortcut_system">Follow system</string>

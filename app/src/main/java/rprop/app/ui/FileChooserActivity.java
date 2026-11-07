@@ -19,6 +19,9 @@ import androidx.documentfile.provider.DocumentFile;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import rp.file.R;
 import rprop.app.img.ImageViewActivity;
 import rprop.app.lan.LanShareHelper;
@@ -38,9 +41,10 @@ public final class FileChooserActivity extends AppCompatActivity {
     private static final int[] OPEN_OPTIONS = {
             OPTION_TEXT, OPTION_IMAGE, OPTION_VIDEO, OPTION_ZIP
     };
+    private static final int TITLE_PATH_LIMIT = 3;
 
-    @Nullable
-    private Uri mUri;
+    @NonNull
+    private final ArrayList<Uri> mUris = new ArrayList<>();
     private FileCopyToHelper mCopyToHelper;
     @NonNull
     private int[] mOptionIds = new int[0];
@@ -48,7 +52,7 @@ public final class FileChooserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.mCopyToHelper = new FileCopyToHelper(this, () -> this.mUri, this::finish);
+        this.mCopyToHelper = new FileCopyToHelper(this, () -> this.mUris, this::finish);
         showOpenModeDialog(getIntent());
     }
 
@@ -60,17 +64,19 @@ public final class FileChooserActivity extends AppCompatActivity {
     }
 
     private void showOpenModeDialog(final Intent intent) {
-        final Uri uri = FileOpenIntentHelper.extractUri(intent);
-        if (uri == null) {
+        final ArrayList<Uri> uris = FileOpenIntentHelper.extractUris(intent);
+        if (uris.isEmpty()) {
             finish();
             return;
         }
-        this.mUri = uri;
-        final int suggested = resolveSuggestedOption(intent, uri);
+        this.mUris.clear();
+        this.mUris.addAll(uris);
+        final Uri first = uris.get(0);
+        final int suggested = resolveSuggestedOption(intent, first);
         final CharSequence[] items = buildOptionItems(suggested);
         final TextView titleView = (TextView) getLayoutInflater()
                 .inflate(R.layout.dialog_file_path_title, null);
-        titleView.setText(FileUriActions.resolvePathLabel(this, uri));
+        titleView.setText(buildTitle(uris));
         new MaterialAlertDialogBuilder(this)
                 .setCustomTitle(titleView)
                 .setItems(items, (dialog, which) -> handleOption(which))
@@ -102,6 +108,21 @@ public final class FileChooserActivity extends AppCompatActivity {
             items[i] = option == suggested ? bold(label) : label;
         }
         return items;
+    }
+
+    @NonNull
+    private CharSequence buildTitle(@NonNull final List<Uri> uris) {
+        if (uris.size() == 1) {
+            return FileUriActions.resolvePathLabel(this, uris.get(0));
+        }
+        final StringBuilder title = new StringBuilder();
+        title.append(getString(R.string.open_files_count, uris.size()));
+        final int shown = Math.min(uris.size(), TITLE_PATH_LIMIT);
+        for (int i = 0; i < shown; i++) {
+            title.append('\n');
+            title.append(FileUriActions.resolvePathLabel(this, uris.get(i)));
+        }
+        return title;
     }
 
     private static boolean isOpenOption(final int option) {
@@ -331,29 +352,29 @@ public final class FileChooserActivity extends AppCompatActivity {
             finish();
             return;
         }
-        final Uri uri = this.mUri;
-        if (uri == null) {
+        if (this.mUris.isEmpty()) {
             finish();
             return;
         }
+        final Uri first = this.mUris.get(0);
         switch (this.mOptionIds[which]) {
             case OPTION_TEXT:
-                TextViewActivity.call(this, uri);
+                TextViewActivity.call(this, first);
                 break;
             case OPTION_IMAGE:
-                ImageViewActivity.call(this, uri);
+                ImageViewActivity.call(this, first);
                 break;
             case OPTION_VIDEO:
-                VideoPlayActivity.call(this, uri);
+                VideoPlayActivity.call(this, first);
                 break;
             case OPTION_ZIP:
-                ZipBrowseActivity.call(this, uri);
+                ZipBrowseActivity.call(this, first);
                 break;
             case OPTION_SHARE:
-                FileUriActions.share(this, uri);
+                FileUriActions.share(this, this.mUris);
                 return;
             case OPTION_SHARE_LAN:
-                LanShareHelper.share(this, uri);
+                LanShareHelper.share(this, this.mUris);
                 return;
             case OPTION_COPY:
                 this.mCopyToHelper.start();

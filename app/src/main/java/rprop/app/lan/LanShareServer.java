@@ -41,12 +41,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import fi.iki.elonen.NanoHTTPD;
+import rp.file.BuildConfig;
 import rprop.app.ui.FileUriActions;
 import rprop.app.io.PreadInputStream;
 import rprop.app.zip.ZipArchiveSession;
 
 public final class LanShareServer extends NanoHTTPD {
     public static final int PORT = 10021;
+    static final String SHARE_ERR_SERVER = "LAN HTTP server is not running";
+    static final String SHARE_ERR_OPEN = "unable to open file descriptor";
+    static final String SHARE_ERR_LENGTH = "unknown file length";
 
     private static final String TAG = "lan-share";
     private static final String PATH_SHARE = "/s/";
@@ -115,13 +119,13 @@ public final class LanShareServer extends NanoHTTPD {
         ensureStarted(context);
         final LanShareServer server = sInstance;
         if (server == null) {
-            throw new IOException("LAN HTTP server is not running");
+            throw new IOException(SHARE_ERR_SERVER);
         }
 
         final ParcelFileDescriptor pfd = context.getContentResolver()
                 .openFileDescriptor(uri, "r");
         if (pfd == null) {
-            throw new IOException("unable to open file descriptor");
+            throw new IOException(SHARE_ERR_OPEN);
         }
         long length = pfd.getStatSize();
         if (length < 0) {
@@ -129,7 +133,7 @@ public final class LanShareServer extends NanoHTTPD {
         }
         if (length < 0) {
             closeQuietly(pfd);
-            throw new IOException("unknown file length");
+            throw new IOException(SHARE_ERR_LENGTH);
         }
         String mimeType = context.getContentResolver().getType(uri);
         if (mimeType == null || mimeType.isEmpty()) {
@@ -609,6 +613,8 @@ public final class LanShareServer extends NanoHTTPD {
             final boolean hasFlash = flashMessage != null && !flashMessage.isEmpty();
             final boolean isError = error != null && error;
             page = page.replace("{{PORT}}", String.valueOf(PORT))
+                    .replace("{{VERSION}}", escapeHtml(BuildConfig.VERSION_NAME)
+                            + " (" + BuildConfig.VERSION_CODE + ')')
                     .replace("{{FLASH_CLASS}}", hasFlash ? (isError ? "err" : "ok") : "ok")
                     .replace("{{FLASH_ATTR}}", hasFlash ? "" : " style=\"display:none\"")
                     .replace("{{FLASH_BODY}}", hasFlash ? escapeHtml(flashMessage) : "")
@@ -978,6 +984,11 @@ public final class LanShareServer extends NanoHTTPD {
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
                 .replace("'", "&#39;");
+    }
+
+    @NonNull
+    public static String buildIndexUrl(@NonNull final String ip) {
+        return "http://" + ip + ':' + PORT + '/';
     }
 
     @NonNull

@@ -6,8 +6,12 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Collections;
+import java.util.List;
 
 import rp.file.R;
 
@@ -17,8 +21,13 @@ public final class FileCopyToHelper {
         Uri getUri();
     }
 
+    public interface UriListProvider {
+        @NonNull
+        List<Uri> getUris();
+    }
+
     private final AppCompatActivity mActivity;
-    private final UriProvider mUriProvider;
+    private final UriListProvider mUriListProvider;
     @Nullable
     private final Runnable mOnComplete;
     private final ActivityResultLauncher<Intent> mLauncher;
@@ -29,16 +38,27 @@ public final class FileCopyToHelper {
 
     public FileCopyToHelper(final AppCompatActivity activity, final UriProvider uriProvider,
                             @Nullable final Runnable onComplete) {
+        this(activity, () -> {
+            final Uri uri = uriProvider.getUri();
+            if (uri == null) {
+                return Collections.emptyList();
+            }
+            return Collections.singletonList(uri);
+        }, onComplete);
+    }
+
+    public FileCopyToHelper(final AppCompatActivity activity, final UriListProvider uriListProvider,
+                            @Nullable final Runnable onComplete) {
         this.mActivity = activity;
-        this.mUriProvider = uriProvider;
+        this.mUriListProvider = uriListProvider;
         this.mOnComplete = onComplete;
         this.mLauncher = activity.registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    final Uri uri = this.mUriProvider.getUri();
+                    final List<Uri> uris = this.mUriListProvider.getUris();
                     if (result.getResultCode() != AppCompatActivity.RESULT_OK
                             || result.getData() == null
-                            || uri == null) {
+                            || uris.isEmpty()) {
                         complete();
                         return;
                     }
@@ -48,10 +68,21 @@ public final class FileCopyToHelper {
                         complete();
                         return;
                     }
-                    final boolean copied = FileUriActions.moveToTree(this.mActivity, uri, treeUri);
-                    Toast.makeText(this.mActivity,
-                            copied ? R.string.copy_done : R.string.copy_failed,
-                            Toast.LENGTH_LONG).show();
+                    int copied = 0;
+                    for (final Uri uri : uris) {
+                        if (FileUriActions.moveToTree(this.mActivity, uri, treeUri)) {
+                            copied++;
+                        }
+                    }
+                    final int message;
+                    if (copied == uris.size()) {
+                        message = R.string.copy_done;
+                    } else if (copied > 0) {
+                        message = R.string.copy_failed_partial;
+                    } else {
+                        message = R.string.copy_failed;
+                    }
+                    Toast.makeText(this.mActivity, message, Toast.LENGTH_LONG).show();
                     complete();
                 });
     }

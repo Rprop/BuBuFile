@@ -33,6 +33,7 @@ import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 import rp.file.R;
@@ -45,37 +46,72 @@ public final class LanShareHelper {
     }
 
     public static void share(@NonNull final Activity activity, @NonNull final Uri uri) {
-        final String fileName = sanitizeFileName(queryDisplayName(activity, uri));
-        final long length = queryLength(activity, uri);
-        if (fileName == null || fileName.isEmpty() || length < 0) {
-            Toast.makeText(activity, R.string.lan_share_failed, Toast.LENGTH_LONG).show();
-            activity.finish();
+        share(activity, Collections.singletonList(uri));
+    }
+
+    public static void share(@NonNull final Activity activity, @NonNull final List<Uri> uris) {
+        if (uris.isEmpty()) {
+            fail(activity, R.string.lan_share_open_failed);
             return;
         }
         final String ip = resolveLanIpv4();
         if (ip == null) {
-            Toast.makeText(activity, R.string.lan_share_no_network, Toast.LENGTH_LONG).show();
-            activity.finish();
+            fail(activity, R.string.lan_share_no_network);
             return;
         }
-        final LanShareServer.ShareStart shareStart;
-        try {
-            shareStart = LanShareServer.startSharing(activity, uri, fileName, length);
-        } catch (final IOException e) {
-            Log.w(TAG, e);
-            Toast.makeText(activity, R.string.lan_share_failed, Toast.LENGTH_LONG).show();
-            activity.finish();
+        LanShareServer.ShareStart single = null;
+        int shared = 0;
+        int failureRes = 0;
+        for (final Uri uri : uris) {
+            final String fileName = sanitizeFileName(queryDisplayName(activity, uri));
+            if (fileName == null || fileName.isEmpty()) {
+                Log.w(TAG, "share skipped: missing file name, uri=" + uri);
+                if (failureRes == 0) {
+                    failureRes = R.string.lan_share_no_name;
+                }
+                continue;
+            }
+            final long length = queryLength(activity, uri);
+            if (length < 0) {
+                Log.w(TAG, "share skipped: unknown length, uri=" + uri);
+                if (failureRes == 0) {
+                    failureRes = R.string.lan_share_unknown_size;
+                }
+                continue;
+            }
+            try {
+                single = LanShareServer.startSharing(activity, uri, fileName, length);
+                shared++;
+            } catch (final IOException e) {
+                Log.w(TAG, e);
+                if (failureRes == 0) {
+                    failureRes = messageForShareStart(e);
+                }
+            }
+        }
+        if (shared == 0) {
+            fail(activity, failureRes == 0 ? R.string.lan_share_open_failed : failureRes);
             return;
         }
-        final String shareUrl = LanShareServer.buildShareUrl(
-                ip, shareStart.fileName, shareStart.length);
+        if (failureRes != 0) {
+            Toast.makeText(activity, failureRes, Toast.LENGTH_LONG).show();
+        }
+        final String shareUrl;
+        if (uris.size() == 1 && single != null) {
+            shareUrl = LanShareServer.buildShareUrl(ip, single.fileName, single.length);
+        } else {
+            shareUrl = LanShareServer.buildIndexUrl(ip);
+        }
+        showQr(activity, shareUrl);
+    }
+
+    private static void showQr(@NonNull final Activity activity, @NonNull final String shareUrl) {
         final Bitmap qrBitmap;
         try {
             qrBitmap = createQrBitmap(shareUrl, QR_SIZE_PX);
         } catch (final WriterException e) {
             Log.w(TAG, e);
-            Toast.makeText(activity, R.string.lan_share_failed, Toast.LENGTH_LONG).show();
-            activity.finish();
+            fail(activity, R.string.lan_share_qr_failed);
             return;
         }
         final View content = LayoutInflater.from(activity)
@@ -94,6 +130,22 @@ public final class LanShareHelper {
                     }
                 })
                 .show();
+    }
+
+    private static void fail(@NonNull final Activity activity, final int messageRes) {
+        Toast.makeText(activity, messageRes, Toast.LENGTH_LONG).show();
+        activity.finish();
+    }
+
+    private static int messageForShareStart(@NonNull final IOException e) {
+        final String message = e.getMessage();
+        if (LanShareServer.SHARE_ERR_SERVER.equals(message)) {
+            return R.string.lan_share_server_down;
+        }
+        if (LanShareServer.SHARE_ERR_LENGTH.equals(message)) {
+            return R.string.lan_share_unknown_size;
+        }
+        return R.string.lan_share_open_failed;
     }
 
     @Nullable
